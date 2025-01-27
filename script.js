@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentSentenceIndex = 0;
     let score = 0;
-    let timeLeft = 60;
+    let timeLeft = 120;
     let timerInterval;
     let incorrectAnswers = [];
 
@@ -99,21 +99,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Start the game
     function startGame() {
-        shuffleArray(sentences);
-        currentSentenceIndex = 0;
-        score = 0;
-        timeLeft = 60;
-        incorrectAnswers = [];
-        document.getElementById('score').textContent = `Score: ${score}`;
-        document.getElementById('sentence').textContent = sentences[currentSentenceIndex].sentence;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('restart').style.display = 'none';
-        document.getElementById('report').style.display = 'none';
-        document.getElementById('submit').disabled = false;
-        document.getElementById('answer').disabled = false;
-        document.getElementById('answer').value = '';
-        startTimer();
-    }
+    shuffleArray(sentences);
+    currentSentenceIndex = 0;
+    score = 0;
+    timeLeft = 120; // Set time limit to 2 minutes
+    incorrectAnswers = [];
+    document.getElementById('score').textContent = `Score: ${score}`;
+    document.getElementById('sentence').textContent = sentences[currentSentenceIndex].sentence;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('restart').style.display = 'none';
+    document.getElementById('report').style.display = 'none';
+    document.getElementById('submit').disabled = false;
+    document.getElementById('answer').disabled = false;
+    document.getElementById('answer').value = '';
+    document.getElementById('answer').focus();
+    document.getElementById('timer').textContent = `Time left: 2:00`; // Update initial display
+    startTimer();
+}
 
     // Check the answer
     function checkAnswer() {
@@ -144,7 +146,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.getElementById('sentence').textContent = sentences[currentSentenceIndex].sentence;
         document.getElementById('answer').value = '';
+        document.getElementById('answer').focus(); // Automatically focus the textbox
     }
+
+    function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+        }
+    }, 1000);
+}
 
     // Start the timer
     function startTimer() {
@@ -186,6 +203,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach event listeners
     document.getElementById('submit').addEventListener('click', checkAnswer);
     document.getElementById('restart').addEventListener('click', startGame);
+
+    // Submit on Enter key
+    document.getElementById('answer').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            checkAnswer();
+        }
+    });
 
     // Start the game when the page loads
     startGame();
